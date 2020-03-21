@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "staradmin-b23d2": {
+      "hosting": {
+        "StarAdmin": [
+          "staradmin-b23d2"
+        ]
+      }
+    }
+  }
+}
