@@ -25,11 +25,13 @@ import { DetalleComponent } from './ingreso-egreso/detalle/detalle.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
+import { ChartsModule } from 'ng2-charts';
 
 //NGRX
 import { StoreModule } from "@ngrx/store";
 import { appReducers } from './app.reducer';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { OrdenPipe } from './pipes/orden.pipe';
 
 
 @NgModule({
@@ -43,7 +45,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     DetalleComponent,
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    OrdenPipe
   ],
   imports: [
     BrowserModule,
@@ -57,8 +60,9 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
       maxAge: 25, // Retains last 25 states
       logOnly: environment.production, // Restrict extension to log-only mode
     }),
+    ChartsModule
   ],
-  providers: [],
+  providers: [ OrdenPipe ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
