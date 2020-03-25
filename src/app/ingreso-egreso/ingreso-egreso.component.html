@@ -1,55 +1,71 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Agregar Ingreso / Egreso</h4>
-                <p class="card-description">
-                    Especifique el monto y el tipo
-                </p>
+          <div class="card-body">
+            <h4 class="card-title">Agregar Ingreso / Egreso</h4>
+            <p class="card-description">
+              Especifique el monto y el tipo
+            </p>
 
-                <form [formGroup]="ingresoForm" (ngSubmit)="guardar()">
+            <form [formGroup]="ingresoForm" (ngSubmit)="guardar()">
+              
+              <div class="form-group">
+                <label>Descripción</label>
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Descripción"
+                       formControlName="descripcion"
+                       name="descripcion">
+              </div>
 
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <input type="text" class="form-control" placeholder="Descripción" name="descripcion" formControlName="descripcion">
-                    </div>
+              <div class="form-group">
+                  <label>Monto</label>
+                  <input type="number" 
+                         class="form-control" 
+                         placeholder="Monto"
+                         formControlName="monto"
+                         name="monto">
+                    <p>
+                      Debe de ser un monto positivo
+                    </p>
+                </div>
 
-                    <div class="form-group">
-                        <label>Monto</label>
-                        <input type="number" class="form-control" placeholder="Monto" name="monto" formControlName="monto">
-                        <p>
-                            Debe de ser un monto positivo
-                        </p>
-                    </div>
+              <div class="form-group">
+                  <label>Tipo</label>
+                  <br>
+                  <button *ngIf="tipo === 'ingreso'" (click)="tipo = 'egreso'" type="button" class="btn btn-primary btn-block">Ingreso</button>
+                  <button *ngIf="tipo === 'egreso'"  (click)="tipo = 'ingreso'" type="button" class="btn btn-warning btn-block">Egreso</button>
+              </div>
 
-                    <div class="form-group">
-                        <label>Tipo</label>
-                        <br>
-                        <button *ngIf="tipo === 'ingreso'" (click)="tipo = 'egreso'" type="button" class="btn btn-primary btn-block">Ingreso</button>
-                        <button *ngIf="tipo === 'egreso'" (click)="tipo = 'ingreso'" type="button" class="btn btn-warning btn-block">Egreso</button>
-                    </div>
+              <hr>
+              <button type="submit" class="btn btn-success mr-2"
+                      [disabled]="ingresoForm.invalid"
+                      *ngIf="!cargando">
+                <i class="fa fa-save"></i>
+                Agregar
+              </button>
 
-                    <hr>
-                    <button type="submit" class="btn btn-success mr-2" [disabled]="ingresoForm.invalid" *ngIf="!cargando">
-                        <i class="fa fa-save"></i>
-                        Agregar
-                    </button>
-                    <button type="submit" class="btn btn-success mr-2" [disabled]="ingresoForm.invalid" *ngIf="cargando">
-                        <i class="fa fa-spin fa-sync"></i>
-                        Cargando...
-                    </button>
+              <button type="submit" class="btn btn-success mr-2"
+                      [disabled]="true"
+                      *ngIf="cargando">
+                <i class="fa fa-spin fa-sync"></i>
+                Guardando...
+              </button>
 
-                    <!-- 
+              
+
+              <!-- 
                 <button disabled class="btn btn-success mr-2">
                   <i class="fa fa-spin fa-sync"></i>
                   Espere por favor...
                 </button> 
               -->
+              
+              <button type="reset" class="btn btn-light">Cancelar</button>
 
-                    <button type="reset" class="btn btn-light">Cancelar</button>
-
-                </form>
-            </div>
+            </form>
+          </div>
         </div>
-    </div>
+      </div>
 </div>
+          

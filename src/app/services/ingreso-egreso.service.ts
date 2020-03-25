@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+
 import 'firebase/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { IngresoEgreso } from '../models/ingreso-egreso.model';
 import { AuthService } from './auth.service';
+
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -11,31 +13,38 @@ import { map } from 'rxjs/operators';
 export class IngresoEgresoService {
 
   constructor( private firestore: AngularFirestore,
-              private _as: AuthService ) { }
+               private authService: AuthService ) { }
 
-  crearIngresoEgreso( ingresoEgreso: IngresoEgreso){
-    return this.firestore.doc(`${ this._as.getuser().uid }/ingresos-egresos`)
-      .collection('items')
-      .add( { ...ingresoEgreso } )
-      
+  crearIngresoEgreso( ingresoEgreso: IngresoEgreso ) {
+    const uid = this.authService.user.uid;
+
+    delete ingresoEgreso.uid;
+
+    return this.firestore.doc(`${ uid }/ingresos-egresos`)
+        .collection('items')
+        .add({ ...ingresoEgreso });
+
   }
 
-  initIngresosEgresosListener( uid: string ){
+  initIngresosEgresosListener(uid: string) {
+
     return this.firestore.collection(`${ uid }/ingresos-egresos/items`)
-      .snapshotChanges().pipe(
-        map( snapshot =>  {
-          return snapshot.map ( doc => {
-            return {
+      .snapshotChanges()
+      .pipe(
+        map( snapshot => snapshot.map( doc => ({
               uid: doc.payload.doc.id,
               ...doc.payload.doc.data() as any
-
-            }
-          })
-        })
-      )
+            })
+          )
+        )
+      );
   }
 
-  borrarIngresoEgreso( uidItem: string ){
-    return this.firestore.doc(`${ this._as.getuser().uid }/ingresos-egresos/items/${ uidItem}`).delete();
+  borrarIngresoEgreso( uidItem: string ) {
+
+    const uid = this.authService.user.uid;
+    return this.firestore.doc(`${ uid }/ingresos-egresos/items/${ uidItem }`).delete();
+
   }
+
 }

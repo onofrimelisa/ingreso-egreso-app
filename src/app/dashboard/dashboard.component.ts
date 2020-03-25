@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.reducer';
-import { filter } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
-import { IngresoEgresoService } from '../services/ingreso-egreso.service';
 import * as ingresoEgresoActions from '../ingreso-egreso/ingreso-egreso.actions';
+
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+import { IngresoEgresoService } from '../services/ingreso-egreso.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,26 +17,32 @@ import * as ingresoEgresoActions from '../ingreso-egreso/ingreso-egreso.actions'
 export class DashboardComponent implements OnInit, OnDestroy {
 
   userSubs: Subscription;
-  ingresosEgresosSubs: Subscription;
+  ingresosSubs: Subscription;
 
   constructor( private store: Store<AppState>,
-              private _ies: IngresoEgresoService ) { }
+               private ingresoEgresoService: IngresoEgresoService ) { }
 
   ngOnInit() {
 
-    this.userSubs = this.store.select('user').pipe(
-      filter( auth => auth.user != null )
-    ).subscribe( ({user}) => {
-      this.ingresosEgresosSubs = this._ies.initIngresosEgresosListener( user.uid )
-        .subscribe( (ingresosEgresos) => {
-          this.store.dispatch( ingresoEgresoActions.setItems( {items: ingresosEgresos} ) )
-        })
-    });
+    this.userSubs = this.store.select('user')
+      .pipe(
+        filter( auth => auth.user != null )
+      )
+      .subscribe( ({user}) => {
+
+        this.ingresosSubs = this.ingresoEgresoService.initIngresosEgresosListener( user.uid )
+          .subscribe( ingresosEgresosFB => {
+            
+            this.store.dispatch( ingresoEgresoActions.setItems({ items: ingresosEgresosFB }) )
+
+          })
+      });
+
   }
 
   ngOnDestroy(){
-    this.ingresosEgresosSubs.unsubscribe();
-    this.userSubs.unsubscribe();
+    this.ingresosSubs?.unsubscribe();
+    this.userSubs?.unsubscribe();
   }
 
 }

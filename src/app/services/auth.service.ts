@@ -4,47 +4,55 @@ import 'firebase/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 
+import { Store } from '@ngrx/store';
+import { AppState } from '../app.reducer';
+import * as authActions from '../auth/auth.actions';
+import * as ingresoEgresoActions from '../ingreso-egreso/ingreso-egreso.actions';
+
 import { map } from 'rxjs/operators';
 import { Usuario } from '../models/usuario.model';
-import { Store } from '@ngrx/store';
-import * as authActions from '../auth/auth.actions';
 import { Subscription } from 'rxjs';
-import * as ingresosEgresosActions from '../ingreso-egreso/ingreso-egreso.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  userSubs: Subscription;
+  userSubscription: Subscription;
   private _user: Usuario;
 
-  getuser(){
-    return {... this._user};
+  get user() {
+    return this._user;
   }
 
   constructor( public auth: AngularFireAuth,
-              private firestore: AngularFirestore,
-              private store: Store) { }
+               private firestore: AngularFirestore,
+               private store: Store<AppState>) { }
 
   initAuthListener() {
 
     this.auth.authState.subscribe( fuser => {
-      if (fuser) {
-        this.userSubs = this.firestore.doc(`${ fuser.uid }/usuario`).valueChanges().subscribe( (firestoreUser:any)=> {
-          const user = Usuario.fromFirebase( firestoreUser );
-          this._user = user;
-          this.store.dispatch( authActions.setUser( { user } ) )
+      if ( fuser ) {
+        // existe
+        this.userSubscription = this.firestore.doc(`${ fuser.uid }/usuario`).valueChanges()
+          .subscribe( (firestoreUser: any) => {
           
-        })
-        
-      }else{
+
+            const user = Usuario.fromFirebase( firestoreUser );
+            this._user = user;
+            this.store.dispatch( authActions.setUser({ user }) );
+            
+          })
+
+      } else {
+        // no existe
         this._user = null;
-        this.userSubs.unsubscribe();
-        this.store.dispatch( authActions.unsetUser() );
-        this.store.dispatch( ingresosEgresosActions.unsetItems() );
+        this.userSubscription?.unsubscribe();
+        this.store.dispatch( authActions.unSetUser() );
+        this.store.dispatch( ingresoEgresoActions.unSetItems() );
       }
-    })
+
+    });
 
   }
 

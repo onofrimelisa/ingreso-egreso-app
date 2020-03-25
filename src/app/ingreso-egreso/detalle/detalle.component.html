@@ -1,42 +1,42 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Detalle de ingreso egreso</h4>
+          <div class="card-body">
+            <h4 class="card-title">Detalle de ingreso egreso</h4>
 
-                <div *ngIf="ingresosEgresos.length == 0" class="alert alert-info alert-dismissible fade show" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    <span class="sr-only">Close</span>
-                  </button>
-                    <strong>Ups!</strong> Parece que todavía no hay ningún ingreso/egreso cargado.
-                </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Monto</th>
+                  <th>Tipo</th>
+                  <th></th>
+                </tr>
+              </thead>
 
-                <table *ngIf="ingresosEgresos.length != 0" class="table">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Monto</th>
-                            <th>Tipo</th>
-                            <th></th>
-                        </tr>
-                    </thead>
+              <tbody>
+                <tr *ngFor="let item of ingresosEgresos | ordenIngreso">
+                  <td> {{ item.descripcion }} </td>
+                  <td> {{ item.monto | currency }} </td>
+                  <td [class.text-success]=" item.tipo === 'ingreso'"
+                      [class.text-danger]="  item.tipo === 'egreso'"> 
+                    {{ item.tipo }} 
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger"
+                            (click)="borrar( item.uid )">
+                      <i class="fa fa-trash"></i>
+                      Borrar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
 
-                    <tbody>
-                        <tr *ngFor="let item of ingresosEgresos | orden">
-                            <td>{{ item.descripcion | titlecase }}</td>
-                            <td>{{ item.monto | currency}}</td>
-                            <td [class.text-success]="item.tipo === 'ingreso'" [class.text-danger]="item.tipo === 'egreso'">
-                                {{ item.tipo | titlecase }}
-                            </td>
-                            <td><button type="button" class="btn btn-danger" (click)="borrar( item.uid )" title="Eliminar"><i class="fa fa-trash"></i></button></td>
-                        </tr>
-                    </tbody>
-
-                </table>
+            </table>
 
 
-            </div>
+          </div>
         </div>
     </div>
 </div>
+  

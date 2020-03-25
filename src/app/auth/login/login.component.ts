@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2'
-import { AuthService } from '../../services/auth.service';
+
 import { Store } from '@ngrx/store';
 import { AppState } from '../../app.reducer';
 import * as ui from '../../shared/ui.actions';
+
+import Swal from 'sweetalert2'
+import { AuthService } from '../../services/auth.service';
+
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -16,14 +19,14 @@ import { Subscription } from 'rxjs';
 export class LoginComponent implements OnInit, OnDestroy {
 
   loginForm: FormGroup;
-  loading: boolean = false;
-  uiSubs: Subscription;
+  cargando: boolean = false;
+  uiSubscription: Subscription;
 
 
   constructor( private fb: FormBuilder,
                private authService: AuthService,
-               private router: Router,
-               private store: Store<AppState> ) { }
+               private store: Store<AppState>,
+               private router: Router ) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -31,16 +34,23 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: ['', Validators.required ],
     });
 
-    this.uiSubs = this.store.select('ui').subscribe( ui => {
-      this.loading = ui.isLoading;
-    })
+    this.uiSubscription = this.store.select('ui')
+                              .subscribe( ui => {
+                                this.cargando = ui.isLoading;
+                              });
+
+  }
+
+  ngOnDestroy() {
+    this.uiSubscription.unsubscribe();
   }
 
   login() {
 
     if ( this.loginForm.invalid ) { return; }
 
-    this.store.dispatch( ui.isLoading() )
+    this.store.dispatch( ui.isLoading() );
+
 
     // Swal.fire({
     //   title: 'Espere por favor',
@@ -55,12 +65,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       .then( credenciales => {
         console.log(credenciales);
         // Swal.close();
-        this.store.dispatch( ui.stopLoading( ) );
+        this.store.dispatch( ui.stopLoading() );
         this.router.navigate(['/']);
       })
       .catch( err => {
-        this.store.dispatch( ui.stopLoading( ) );
-
+        this.store.dispatch( ui.stopLoading() );
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -68,10 +77,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         })
       });
 
-  }
-  
-  ngOnDestroy(){
-    this.uiSubs.unsubscribe();
   }
 
 }
